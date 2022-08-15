@@ -11,11 +11,12 @@ import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 
 import models.Player;
+import models.Spritesheet;
 import models.World;
 
 public class Game extends Canvas implements Runnable, KeyListener {
 	
-	public static int WIDTH=640,HEIGHT = 640; // CONSTANTES GLOBAIS DE TAMANHO
+	public static int WIDTH=960,HEIGHT = 480; // CONSTANTES GLOBAIS DE TAMANHO
 	public Player player;
 	public World world;
 	
@@ -23,7 +24,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		this.addKeyListener(this); // LE AS TECLAS
 		this.setPreferredSize(new Dimension(WIDTH,HEIGHT)); // TAMANHO JANELA
 		/* INSTANCIAS PRINCIPAIS */
-		player = new Player(32,32);
+		System.out.println("game antes de instanciar");
+		new Spritesheet();
+		player = new Player(40,40);
 		world = new World(WIDTH,HEIGHT,32);
 	}
 	
@@ -34,6 +37,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		frame.pack(); // JUNTA TITULO E CONTEÚDO NA JANELA
 		frame.setLocationRelativeTo(null); // CENTRALIZA JANELA
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
 		frame.setVisible(true);
 		
 		new Thread(game).start();// PROCURA O RUN DA GAME
@@ -54,12 +58,25 @@ public class Game extends Canvas implements Runnable, KeyListener {
 			return;
 		}
 		Graphics g = bs.getDrawGraphics();
-		
-		/* background */
-		g.setColor(Color.black);
-		g.fillRect(0,0,WIDTH,HEIGHT);
-		/*end background */
-		
+		if (HEIGHT == WIDTH) {
+			switch(WIDTH) {
+			case 480:
+				world.renderBackground(g, WIDTH, HEIGHT,4,3);
+				break;
+			case 640:
+				world.renderBackground(g, WIDTH, HEIGHT,4,4);
+				break;
+			}
+		} else {
+			switch(WIDTH) {
+			case 640:
+				world.renderBackground(g, WIDTH, HEIGHT,3,3);
+				break;
+			case 960:
+				world.renderBackground(g, WIDTH, HEIGHT,6,4);
+				break;
+			}
+		}
 		player.render(g);
 		world.render(g);
 		bs.show();
@@ -84,6 +101,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
 				break;
 			case KeyEvent.VK_S:
 				player.move = "down";
+				break;
+			case KeyEvent.VK_SPACE:
+				player.move = "f_atack";
 				break;
 			default:
 				player.move = "stop";
